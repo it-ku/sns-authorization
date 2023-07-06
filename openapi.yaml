@@ -1,0 +1,349 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: AuthorizationService API
+    version: 0.0.1
+paths:
+    /api:
+        put:
+            tags:
+                - AuthorizationService
+            description: Api更新
+            operationId: AuthorizationService_UpdateApi
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/authorization.v1.UpdateApiReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.CheckReply'
+        post:
+            tags:
+                - AuthorizationService
+            description: Api创建
+            operationId: AuthorizationService_CreateApi
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/authorization.v1.CreateApiReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.Api'
+        delete:
+            tags:
+                - AuthorizationService
+            description: Api删除
+            operationId: AuthorizationService_DeleteApi
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.CheckReply'
+    /apiAll:
+        get:
+            tags:
+                - AuthorizationService
+            description: |-
+                ================== Api ==================
+                 Api列表 - 所有
+            operationId: AuthorizationService_GetApiListAll
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.GetApiListAllReply'
+    /apis:
+        get:
+            tags:
+                - AuthorizationService
+            description: Api列表 - 分页
+            operationId: AuthorizationService_GetApiList
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.GetApiListReply'
+    /auth:
+        get:
+            tags:
+                - AuthorizationService
+            operationId: AuthorizationService_CheckAuthorization
+            parameters:
+                - name: sub
+                  in: query
+                  description: 主题
+                  schema:
+                    type: string
+                - name: obj
+                  in: query
+                  description: 操作对象
+                  schema:
+                    type: string
+                - name: act
+                  in: query
+                  description: 操作行为
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.CheckAuthorizationReply'
+    /role:
+        put:
+            tags:
+                - AuthorizationService
+            description: 角色更新
+            operationId: AuthorizationService_UpdateRole
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/authorization.v1.UpdateRoleReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.CheckReply'
+        post:
+            tags:
+                - AuthorizationService
+            description: 角色创建
+            operationId: AuthorizationService_CreateRole
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/authorization.v1.CreateRoleReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.Role'
+        delete:
+            tags:
+                - AuthorizationService
+            description: 角色删除
+            operationId: AuthorizationService_DeleteRole
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.CheckReply'
+    /roleAll:
+        get:
+            tags:
+                - AuthorizationService
+            description: |-
+                ================== 角色 ==================
+                 全部角色
+            operationId: AuthorizationService_GetRoleAll
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.GetRoleAllReply'
+    /roles:
+        get:
+            tags:
+                - AuthorizationService
+            operationId: AuthorizationService_GetRoleList
+            parameters:
+                - name: page
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+                - name: pageSize
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+                - name: name
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.GetRoleListReply'
+components:
+    schemas:
+        authorization.v1.Api:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                name:
+                    type: string
+                group:
+                    type: string
+                method:
+                    type: string
+                path:
+                    type: string
+                domain:
+                    type: string
+            description: 响应 - API信息
+        authorization.v1.CheckAuthorizationReply:
+            type: object
+            properties:
+                success:
+                    type: boolean
+        authorization.v1.CheckReply:
+            type: object
+            properties:
+                success:
+                    type: boolean
+            description: 通用响应 - 只返回是否处理成功
+        authorization.v1.CreateApiReq:
+            type: object
+            properties:
+                name:
+                    type: string
+                group:
+                    type: string
+                method:
+                    type: string
+                path:
+                    type: string
+            description: Api创建
+        authorization.v1.CreateRoleReq:
+            type: object
+            properties:
+                name:
+                    type: string
+            description: 角色创建
+        authorization.v1.GetApiListAllReply:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/authorization.v1.Api'
+            description: ================== Api ================== Api列表(所有)
+        authorization.v1.GetApiListReply:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: int64
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/authorization.v1.Api'
+        authorization.v1.GetRoleAllReply:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/authorization.v1.Role'
+            description: ================== 角色信息 ================== 角色列表(所有)
+        authorization.v1.GetRoleListReply:
+            type: object
+            properties:
+                total:
+                    type: integer
+                    format: int64
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/authorization.v1.Role'
+        authorization.v1.Role:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                name:
+                    type: string
+        authorization.v1.UpdateApiReq:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                name:
+                    type: string
+                group:
+                    type: string
+                method:
+                    type: string
+                path:
+                    type: string
+            description: Api更新
+        authorization.v1.UpdateRoleReq:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                name:
+                    type: string
+            description: 角色更新
+tags:
+    - name: AuthorizationService

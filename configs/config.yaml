@@ -1,0 +1,46 @@
+env:
+  mode: dev
+service:
+  name: example
+  version: v1
+server:
+  http:
+    addr: 0.0.0.0:8000
+    timeout: 10s
+  grpc:
+    addr: 0.0.0.0:9000
+    timeout: 10s
+data:
+  database:
+    driver: mysql
+    source: root:rootroot@tcp(127.0.0.1:3306)/ks-authorization?parseTime=true&collation=utf8mb4_general_ci&loc=Asia%2FShanghai&charset=utf8mb4
+  redis:
+    addr: 127.0.0.1:6379
+    password:
+    read_timeout: 0.2s
+    write_timeout: 0.2s
+trace:
+  endpoint: http://127.0.0.1:12345/api/trace
+etcd:
+  address: 127.0.0.1:2379
+
+casbin:
+  rbac_model: "[request_definition]
+
+  r = sub, dom, obj, act
+
+  [policy_definition]
+
+  p = sub, dom, obj, act
+
+  [role_definition]
+
+  g = _, _, _
+
+  [policy_effect]
+
+  e = some(where (p.eft == allow))
+
+  [matchers]
+
+  m = g(r.sub, p.sub, r.dom) && r.dom == p.dom && r.obj == p.obj && r.act == p.act"

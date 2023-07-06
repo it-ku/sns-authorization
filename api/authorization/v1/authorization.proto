@@ -1,0 +1,190 @@
+syntax = "proto3";
+
+package authorization.v1;
+
+import "google/api/annotations.proto";
+
+import "validate/validate.proto";
+
+import "google/protobuf/empty.proto";
+
+option go_package = "api/authorization/v1;v1";
+
+service AuthorizationService {
+  rpc CheckAuthorization (CheckAuthorizationReq) returns (CheckAuthorizationReply) {
+    option(google.api.http) = {
+      get: "/auth"
+    };
+  };
+
+  // ================== Api ==================
+  // Api列表 - 所有
+  rpc GetApiListAll(google.protobuf.Empty) returns(GetApiListAllReply) {
+    option(google.api.http) = {
+      get: "/apiAll"
+    };
+  }
+  // Api列表 - 分页
+  rpc GetApiList(GetApiListReq) returns(GetApiListReply){
+    option (google.api.http) = {
+      get:"/apis"
+    };
+  };
+
+  // Api创建
+  rpc CreateApi(CreateApiReq) returns(Api){
+    option (google.api.http) = {
+      post:"/api"
+      body:"*"
+    };
+  };
+  // Api更新
+  rpc UpdateApi(UpdateApiReq) returns(CheckReply){
+    option (google.api.http) = {
+      put:"/api"
+      body:"*"
+    };
+  };
+
+  // Api删除
+  rpc DeleteApi(DeleteApiReq) returns(CheckReply){
+    option (google.api.http) = {
+      delete:"/api"
+    };
+  };
+
+  // ================== 角色 ==================
+  // 全部角色
+  rpc GetRoleAll(google.protobuf.Empty) returns(GetRoleAllReply){
+    option (google.api.http) = {
+      get:"/roleAll"
+    };
+  };
+
+  rpc GetRoleList(GetRoleListReq) returns(GetRoleListReply){
+    option (google.api.http) = {
+      get:"/roles"
+    };
+  };
+
+  // 角色创建
+  rpc CreateRole(CreateRoleReq) returns (Role) {
+    option(google.api.http) = {
+      post: "/role"
+      body: "*"
+    };
+  }
+
+  // 角色更新
+  rpc UpdateRole(UpdateRoleReq) returns(CheckReply){
+    option (google.api.http) = {
+      put:"/role"
+      body:"*"
+    };
+  };
+
+  // 角色删除
+  rpc DeleteRole(DeleteRoleReq) returns(CheckReply){
+    option (google.api.http) = {
+      delete:"/role"
+    };
+  };
+}
+
+// 通用响应 - 只返回是否处理成功
+message CheckReply {
+  bool success = 1;
+}
+
+// 检查权限
+message CheckAuthorizationReq {
+  // 主题
+  string sub = 1;
+  // 操作对象
+  string obj = 2;
+  // 操作行为
+  string act = 3;
+}
+message CheckAuthorizationReply{
+  bool success = 1;
+}
+
+// ================== Api ==================
+// Api列表(所有)
+message GetApiListAllReply {
+  repeated Api list = 1;
+}
+// Api列表(分页)
+message  GetApiListReq {
+  int64 page = 1 [(validate.rules).int64.gt = 0];
+  int64 pageSize = 2 [(validate.rules).int64.gt = 0];
+  string name = 3;
+}
+message GetApiListReply{
+  int64 total = 1;
+  repeated Api list = 2;
+}
+// Api创建
+message CreateApiReq{
+  string name = 1 [(validate.rules).string = {min_len:2, max_len: 255}];
+  string group = 2 [(validate.rules).string = {min_len:2, max_len: 255}];
+  string method = 3 [(validate.rules).string = {min_len:2, max_len: 255}];
+  string path = 4 [(validate.rules).string = {min_len:2, max_len: 255}];
+}
+// Api更新
+message UpdateApiReq {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  string name = 2 [(validate.rules).string = {min_len:2, max_len: 255}];
+  string group = 3 [(validate.rules).string = {min_len:2, max_len: 255}];
+  string method = 4 [(validate.rules).string = {min_len:2, max_len: 255}];
+  string path = 5 [(validate.rules).string = {min_len:2, max_len: 255}];
+}
+// Api删除
+message DeleteApiReq {
+  int64 id = 1;
+}
+
+// 响应 - API信息
+message Api {
+  int64 id = 1;
+  string name = 2;
+  string group = 3;
+  string method = 4;
+  string path = 5;
+  string domain = 6;
+}
+
+// ================== 角色信息 ==================
+// 角色列表(所有)
+message GetRoleAllReply {
+  repeated Role list = 1;
+}
+// 角色列表(分页)
+message GetRoleListReq {
+  int64 page = 1 [(validate.rules).int64.gt = 0];
+  int64 pageSize = 2 [(validate.rules).int64.gt = 0];
+  string name = 3;
+}
+message GetRoleListReply {
+  int64 total = 1;
+  repeated Role list = 2;
+}
+
+// 角色创建
+message CreateRoleReq {
+  string name = 1 [(validate.rules).string = {min_len:2, max_len:255}];
+}
+// 角色更新
+message UpdateRoleReq {
+  int64 id = 1 [(validate.rules).int64.gt = 0];
+  string name = 2 [(validate.rules).string = {min_len:2, max_len:255}];
+}
+// 角色删除
+message DeleteRoleReq{
+  int64 id = 1;
+}
+
+message Role {
+  int64 id = 1;
+  string name = 2;
+}
