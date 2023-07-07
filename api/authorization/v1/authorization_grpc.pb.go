@@ -31,6 +31,11 @@ const (
 	AuthorizationService_CreateRole_FullMethodName         = "/authorization.v1.AuthorizationService/CreateRole"
 	AuthorizationService_UpdateRole_FullMethodName         = "/authorization.v1.AuthorizationService/UpdateRole"
 	AuthorizationService_DeleteRole_FullMethodName         = "/authorization.v1.AuthorizationService/DeleteRole"
+	AuthorizationService_GetMenuAll_FullMethodName         = "/authorization.v1.AuthorizationService/GetMenuAll"
+	AuthorizationService_GetMenuTree_FullMethodName        = "/authorization.v1.AuthorizationService/GetMenuTree"
+	AuthorizationService_CreateMenu_FullMethodName         = "/authorization.v1.AuthorizationService/CreateMenu"
+	AuthorizationService_UpdateMenu_FullMethodName         = "/authorization.v1.AuthorizationService/UpdateMenu"
+	AuthorizationService_DeleteMenu_FullMethodName         = "/authorization.v1.AuthorizationService/DeleteMenu"
 )
 
 // AuthorizationServiceClient is the client API for AuthorizationService service.
@@ -48,7 +53,7 @@ type AuthorizationServiceClient interface {
 	// Api更新
 	UpdateApi(ctx context.Context, in *UpdateApiReq, opts ...grpc.CallOption) (*CheckReply, error)
 	// Api删除
-	DeleteApi(ctx context.Context, in *DeleteApiReq, opts ...grpc.CallOption) (*CheckReply, error)
+	DeleteApi(ctx context.Context, in *IdReq, opts ...grpc.CallOption) (*CheckReply, error)
 	// ================== 角色 ==================
 	// 全部角色
 	GetRoleAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetRoleAllReply, error)
@@ -58,7 +63,18 @@ type AuthorizationServiceClient interface {
 	// 角色更新
 	UpdateRole(ctx context.Context, in *UpdateRoleReq, opts ...grpc.CallOption) (*CheckReply, error)
 	// 角色删除
-	DeleteRole(ctx context.Context, in *DeleteRoleReq, opts ...grpc.CallOption) (*CheckReply, error)
+	DeleteRole(ctx context.Context, in *IdReq, opts ...grpc.CallOption) (*CheckReply, error)
+	// ================== 菜单 ==================
+	// 菜单列表 - 全部
+	GetMenuAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMenuTreeReply, error)
+	// 菜单列表 - 树状结构
+	GetMenuTree(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMenuTreeReply, error)
+	// 菜单 - 创建
+	CreateMenu(ctx context.Context, in *CreateMenuReq, opts ...grpc.CallOption) (*Menu, error)
+	// 菜单 - 更新
+	UpdateMenu(ctx context.Context, in *UpdateMenuReq, opts ...grpc.CallOption) (*CheckReply, error)
+	// 菜单 - 删除
+	DeleteMenu(ctx context.Context, in *IdReq, opts ...grpc.CallOption) (*CheckReply, error)
 }
 
 type authorizationServiceClient struct {
@@ -114,7 +130,7 @@ func (c *authorizationServiceClient) UpdateApi(ctx context.Context, in *UpdateAp
 	return out, nil
 }
 
-func (c *authorizationServiceClient) DeleteApi(ctx context.Context, in *DeleteApiReq, opts ...grpc.CallOption) (*CheckReply, error) {
+func (c *authorizationServiceClient) DeleteApi(ctx context.Context, in *IdReq, opts ...grpc.CallOption) (*CheckReply, error) {
 	out := new(CheckReply)
 	err := c.cc.Invoke(ctx, AuthorizationService_DeleteApi_FullMethodName, in, out, opts...)
 	if err != nil {
@@ -159,9 +175,54 @@ func (c *authorizationServiceClient) UpdateRole(ctx context.Context, in *UpdateR
 	return out, nil
 }
 
-func (c *authorizationServiceClient) DeleteRole(ctx context.Context, in *DeleteRoleReq, opts ...grpc.CallOption) (*CheckReply, error) {
+func (c *authorizationServiceClient) DeleteRole(ctx context.Context, in *IdReq, opts ...grpc.CallOption) (*CheckReply, error) {
 	out := new(CheckReply)
 	err := c.cc.Invoke(ctx, AuthorizationService_DeleteRole_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizationServiceClient) GetMenuAll(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMenuTreeReply, error) {
+	out := new(GetMenuTreeReply)
+	err := c.cc.Invoke(ctx, AuthorizationService_GetMenuAll_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizationServiceClient) GetMenuTree(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetMenuTreeReply, error) {
+	out := new(GetMenuTreeReply)
+	err := c.cc.Invoke(ctx, AuthorizationService_GetMenuTree_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizationServiceClient) CreateMenu(ctx context.Context, in *CreateMenuReq, opts ...grpc.CallOption) (*Menu, error) {
+	out := new(Menu)
+	err := c.cc.Invoke(ctx, AuthorizationService_CreateMenu_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizationServiceClient) UpdateMenu(ctx context.Context, in *UpdateMenuReq, opts ...grpc.CallOption) (*CheckReply, error) {
+	out := new(CheckReply)
+	err := c.cc.Invoke(ctx, AuthorizationService_UpdateMenu_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authorizationServiceClient) DeleteMenu(ctx context.Context, in *IdReq, opts ...grpc.CallOption) (*CheckReply, error) {
+	out := new(CheckReply)
+	err := c.cc.Invoke(ctx, AuthorizationService_DeleteMenu_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -183,7 +244,7 @@ type AuthorizationServiceServer interface {
 	// Api更新
 	UpdateApi(context.Context, *UpdateApiReq) (*CheckReply, error)
 	// Api删除
-	DeleteApi(context.Context, *DeleteApiReq) (*CheckReply, error)
+	DeleteApi(context.Context, *IdReq) (*CheckReply, error)
 	// ================== 角色 ==================
 	// 全部角色
 	GetRoleAll(context.Context, *emptypb.Empty) (*GetRoleAllReply, error)
@@ -193,7 +254,18 @@ type AuthorizationServiceServer interface {
 	// 角色更新
 	UpdateRole(context.Context, *UpdateRoleReq) (*CheckReply, error)
 	// 角色删除
-	DeleteRole(context.Context, *DeleteRoleReq) (*CheckReply, error)
+	DeleteRole(context.Context, *IdReq) (*CheckReply, error)
+	// ================== 菜单 ==================
+	// 菜单列表 - 全部
+	GetMenuAll(context.Context, *emptypb.Empty) (*GetMenuTreeReply, error)
+	// 菜单列表 - 树状结构
+	GetMenuTree(context.Context, *emptypb.Empty) (*GetMenuTreeReply, error)
+	// 菜单 - 创建
+	CreateMenu(context.Context, *CreateMenuReq) (*Menu, error)
+	// 菜单 - 更新
+	UpdateMenu(context.Context, *UpdateMenuReq) (*CheckReply, error)
+	// 菜单 - 删除
+	DeleteMenu(context.Context, *IdReq) (*CheckReply, error)
 	mustEmbedUnimplementedAuthorizationServiceServer()
 }
 
@@ -216,7 +288,7 @@ func (UnimplementedAuthorizationServiceServer) CreateApi(context.Context, *Creat
 func (UnimplementedAuthorizationServiceServer) UpdateApi(context.Context, *UpdateApiReq) (*CheckReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateApi not implemented")
 }
-func (UnimplementedAuthorizationServiceServer) DeleteApi(context.Context, *DeleteApiReq) (*CheckReply, error) {
+func (UnimplementedAuthorizationServiceServer) DeleteApi(context.Context, *IdReq) (*CheckReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteApi not implemented")
 }
 func (UnimplementedAuthorizationServiceServer) GetRoleAll(context.Context, *emptypb.Empty) (*GetRoleAllReply, error) {
@@ -231,8 +303,23 @@ func (UnimplementedAuthorizationServiceServer) CreateRole(context.Context, *Crea
 func (UnimplementedAuthorizationServiceServer) UpdateRole(context.Context, *UpdateRoleReq) (*CheckReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateRole not implemented")
 }
-func (UnimplementedAuthorizationServiceServer) DeleteRole(context.Context, *DeleteRoleReq) (*CheckReply, error) {
+func (UnimplementedAuthorizationServiceServer) DeleteRole(context.Context, *IdReq) (*CheckReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteRole not implemented")
+}
+func (UnimplementedAuthorizationServiceServer) GetMenuAll(context.Context, *emptypb.Empty) (*GetMenuTreeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMenuAll not implemented")
+}
+func (UnimplementedAuthorizationServiceServer) GetMenuTree(context.Context, *emptypb.Empty) (*GetMenuTreeReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetMenuTree not implemented")
+}
+func (UnimplementedAuthorizationServiceServer) CreateMenu(context.Context, *CreateMenuReq) (*Menu, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateMenu not implemented")
+}
+func (UnimplementedAuthorizationServiceServer) UpdateMenu(context.Context, *UpdateMenuReq) (*CheckReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateMenu not implemented")
+}
+func (UnimplementedAuthorizationServiceServer) DeleteMenu(context.Context, *IdReq) (*CheckReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteMenu not implemented")
 }
 func (UnimplementedAuthorizationServiceServer) mustEmbedUnimplementedAuthorizationServiceServer() {}
 
@@ -338,7 +425,7 @@ func _AuthorizationService_UpdateApi_Handler(srv interface{}, ctx context.Contex
 }
 
 func _AuthorizationService_DeleteApi_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteApiReq)
+	in := new(IdReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -350,7 +437,7 @@ func _AuthorizationService_DeleteApi_Handler(srv interface{}, ctx context.Contex
 		FullMethod: AuthorizationService_DeleteApi_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).DeleteApi(ctx, req.(*DeleteApiReq))
+		return srv.(AuthorizationServiceServer).DeleteApi(ctx, req.(*IdReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -428,7 +515,7 @@ func _AuthorizationService_UpdateRole_Handler(srv interface{}, ctx context.Conte
 }
 
 func _AuthorizationService_DeleteRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DeleteRoleReq)
+	in := new(IdReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -440,7 +527,97 @@ func _AuthorizationService_DeleteRole_Handler(srv interface{}, ctx context.Conte
 		FullMethod: AuthorizationService_DeleteRole_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(AuthorizationServiceServer).DeleteRole(ctx, req.(*DeleteRoleReq))
+		return srv.(AuthorizationServiceServer).DeleteRole(ctx, req.(*IdReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthorizationService_GetMenuAll_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServiceServer).GetMenuAll(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthorizationService_GetMenuAll_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServiceServer).GetMenuAll(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthorizationService_GetMenuTree_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(emptypb.Empty)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServiceServer).GetMenuTree(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthorizationService_GetMenuTree_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServiceServer).GetMenuTree(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthorizationService_CreateMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateMenuReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServiceServer).CreateMenu(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthorizationService_CreateMenu_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServiceServer).CreateMenu(ctx, req.(*CreateMenuReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthorizationService_UpdateMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateMenuReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServiceServer).UpdateMenu(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthorizationService_UpdateMenu_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServiceServer).UpdateMenu(ctx, req.(*UpdateMenuReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _AuthorizationService_DeleteMenu_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IdReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(AuthorizationServiceServer).DeleteMenu(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: AuthorizationService_DeleteMenu_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(AuthorizationServiceServer).DeleteMenu(ctx, req.(*IdReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -495,6 +672,26 @@ var AuthorizationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteRole",
 			Handler:    _AuthorizationService_DeleteRole_Handler,
+		},
+		{
+			MethodName: "GetMenuAll",
+			Handler:    _AuthorizationService_GetMenuAll_Handler,
+		},
+		{
+			MethodName: "GetMenuTree",
+			Handler:    _AuthorizationService_GetMenuTree_Handler,
+		},
+		{
+			MethodName: "CreateMenu",
+			Handler:    _AuthorizationService_CreateMenu_Handler,
+		},
+		{
+			MethodName: "UpdateMenu",
+			Handler:    _AuthorizationService_UpdateMenu_Handler,
+		},
+		{
+			MethodName: "DeleteMenu",
+			Handler:    _AuthorizationService_DeleteMenu_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

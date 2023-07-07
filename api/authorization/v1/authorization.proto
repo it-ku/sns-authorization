@@ -47,7 +47,7 @@ service AuthorizationService {
   };
 
   // Api删除
-  rpc DeleteApi(DeleteApiReq) returns(CheckReply){
+  rpc DeleteApi(IdReq) returns(CheckReply){
     option (google.api.http) = {
       delete:"/api"
     };
@@ -84,9 +84,46 @@ service AuthorizationService {
   };
 
   // 角色删除
-  rpc DeleteRole(DeleteRoleReq) returns(CheckReply){
+  rpc DeleteRole(IdReq) returns(CheckReply){
     option (google.api.http) = {
       delete:"/role"
+    };
+  };
+
+  // ================== 菜单 ==================
+  // 菜单列表 - 全部
+  rpc GetMenuAll (google.protobuf.Empty) returns (GetMenuTreeReply){
+    option (google.api.http) = {
+      get:"/menuAll"
+    };
+  };
+  // 菜单列表 - 树状结构
+  rpc GetMenuTree (google.protobuf.Empty) returns (GetMenuTreeReply){
+    option (google.api.http) = {
+      get:"/menuTree"
+    };
+  };
+
+  // 菜单 - 创建
+  rpc CreateMenu (CreateMenuReq) returns (Menu){
+    option (google.api.http) = {
+      post:"/menu"
+      body:"*"
+    };
+  };
+
+  // 菜单 - 更新
+  rpc UpdateMenu (UpdateMenuReq) returns (CheckReply){
+    option (google.api.http) = {
+      put:"/menu"
+      body:"*"
+    };
+  };
+
+  // 菜单 - 删除
+  rpc DeleteMenu (IdReq) returns (CheckReply){
+    option (google.api.http) = {
+      delete:"/menu"
     };
   };
 }
@@ -94,6 +131,10 @@ service AuthorizationService {
 // 通用响应 - 只返回是否处理成功
 message CheckReply {
   bool success = 1;
+}
+
+message IdReq {
+  int64 id = 1;
 }
 
 // 检查权限
@@ -139,10 +180,6 @@ message UpdateApiReq {
   string method = 4 [(validate.rules).string = {min_len:2, max_len: 255}];
   string path = 5 [(validate.rules).string = {min_len:2, max_len: 255}];
 }
-// Api删除
-message DeleteApiReq {
-  int64 id = 1;
-}
 
 // 响应 - API信息
 message Api {
@@ -179,12 +216,57 @@ message UpdateRoleReq {
   int64 id = 1 [(validate.rules).int64.gt = 0];
   string name = 2 [(validate.rules).string = {min_len:2, max_len:255}];
 }
-// 角色删除
-message DeleteRoleReq{
-  int64 id = 1;
-}
 
 message Role {
   int64 id = 1;
   string name = 2;
+}
+
+// ================== 角色信息 ==================
+// 菜单创建
+message CreateMenuReq {
+  int64 parent_id = 1;
+  string path = 2[(validate.rules).string = {min_len: 2, max_len: 255}];
+  string name = 3[(validate.rules).string = {min_len: 2, max_len: 255}];
+  bool hidden = 4;
+  string component = 5[(validate.rules).string = {min_len: 2, max_len: 255}];
+  int64 sort = 6[(validate.rules).int64.gt = 0];
+  string title = 7[(validate.rules).string = {min_len: 2, max_len: 255}];
+  string icon = 8[(validate.rules).string = {min_len: 2, max_len: 255}];
+  string parent_ids = 9[(validate.rules).string = {min_len: 2, max_len: 255}];
+}
+// 菜单更新
+message UpdateMenuReq {
+  int64 id = 1[(validate.rules).int64.gt = 0];
+  int64 parent_id = 2;
+  string path = 3[(validate.rules).string = {min_len: 2, max_len: 255}];
+  string name = 4[(validate.rules).string = {min_len: 2, max_len: 255}];
+  bool hidden = 5;
+  string component = 6[(validate.rules).string = {min_len: 2, max_len: 255}];
+  int64 sort = 7[(validate.rules).int64.gt = 0];
+  string title = 8[(validate.rules).string = {min_len: 2, max_len: 255}];
+  string icon = 9[(validate.rules).string = {min_len: 2, max_len: 255}];
+  string parent_ids = 10[(validate.rules).string = {min_len: 2, max_len: 255}];
+}
+
+// 响应 - 菜单树列表
+message GetMenuTreeReply {
+  repeated Menu list = 1;
+}
+
+// 菜单详情
+message Menu {
+  int64 id = 1;
+  int64 parent_id = 2;
+  string path = 3;
+  string name = 4;
+  bool hidden = 5;
+  string component = 6;
+  int64 sort = 7;
+  string title = 8;
+  string icon = 9;
+  string created_at = 10;
+  string updated_at = 11;
+  repeated Menu children = 12;
+  string parent_ids = 13;
 }

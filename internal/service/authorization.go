@@ -11,18 +11,21 @@ type AuthorizationService struct {
 	v1.UnimplementedAuthorizationServiceServer
 	apiUseCase  *biz.ApiUseCase
 	roleUseCase *biz.RoleUseCase
+	menuUseCase *biz.MenuUseCase
 	log         *log.Helper
 }
 
 func NewAuthorizationService(
 	apiUseCase *biz.ApiUseCase,
 	roleUseCase *biz.RoleUseCase,
+	menuUseCase *biz.MenuUseCase,
 	logger log.Logger,
 ) *AuthorizationService {
 	return &AuthorizationService{
 		log:         log.NewHelper(log.With(logger, "module", "service/authorization")),
 		apiUseCase:  apiUseCase,
 		roleUseCase: roleUseCase,
+		menuUseCase: menuUseCase,
 	}
 }
 

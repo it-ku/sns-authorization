@@ -9,12 +9,16 @@ import (
 )
 
 type ApiEntity struct {
-	Id   int64   `gorm:"primarykey;type:int;comment:主键id"`
+	Id     int64  `gorm:"primarykey;type:int;comment:主键id"`
 	Domain string `gorm:"type:varchar(255);not null;comment:所在域"`
 	Name   string `gorm:"type:varchar(255);not null;comment:名称"`
 	Group  string `gorm:"type:varchar(255);not null;comment:分组"`
 	Method string `gorm:"type:varchar(255);not null;comment:请求方式"`
 	Path   string `gorm:"type:varchar(255);not null;comment:请求路径"`
+}
+
+func (ApiEntity) TableName() string {
+	return "apis"
 }
 
 type ApiRepo struct {

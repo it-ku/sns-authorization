@@ -22,37 +22,53 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationAuthorizationServiceCheckAuthorization = "/authorization.v1.AuthorizationService/CheckAuthorization"
 const OperationAuthorizationServiceCreateApi = "/authorization.v1.AuthorizationService/CreateApi"
+const OperationAuthorizationServiceCreateMenu = "/authorization.v1.AuthorizationService/CreateMenu"
 const OperationAuthorizationServiceCreateRole = "/authorization.v1.AuthorizationService/CreateRole"
 const OperationAuthorizationServiceDeleteApi = "/authorization.v1.AuthorizationService/DeleteApi"
+const OperationAuthorizationServiceDeleteMenu = "/authorization.v1.AuthorizationService/DeleteMenu"
 const OperationAuthorizationServiceDeleteRole = "/authorization.v1.AuthorizationService/DeleteRole"
 const OperationAuthorizationServiceGetApiList = "/authorization.v1.AuthorizationService/GetApiList"
 const OperationAuthorizationServiceGetApiListAll = "/authorization.v1.AuthorizationService/GetApiListAll"
+const OperationAuthorizationServiceGetMenuAll = "/authorization.v1.AuthorizationService/GetMenuAll"
+const OperationAuthorizationServiceGetMenuTree = "/authorization.v1.AuthorizationService/GetMenuTree"
 const OperationAuthorizationServiceGetRoleAll = "/authorization.v1.AuthorizationService/GetRoleAll"
 const OperationAuthorizationServiceGetRoleList = "/authorization.v1.AuthorizationService/GetRoleList"
 const OperationAuthorizationServiceUpdateApi = "/authorization.v1.AuthorizationService/UpdateApi"
+const OperationAuthorizationServiceUpdateMenu = "/authorization.v1.AuthorizationService/UpdateMenu"
 const OperationAuthorizationServiceUpdateRole = "/authorization.v1.AuthorizationService/UpdateRole"
 
 type AuthorizationServiceHTTPServer interface {
 	CheckAuthorization(context.Context, *CheckAuthorizationReq) (*CheckAuthorizationReply, error)
 	// CreateApi Api创建
 	CreateApi(context.Context, *CreateApiReq) (*Api, error)
+	// CreateMenu 菜单 - 创建
+	CreateMenu(context.Context, *CreateMenuReq) (*Menu, error)
 	// CreateRole 角色创建
 	CreateRole(context.Context, *CreateRoleReq) (*Role, error)
 	// DeleteApi Api删除
-	DeleteApi(context.Context, *DeleteApiReq) (*CheckReply, error)
+	DeleteApi(context.Context, *IdReq) (*CheckReply, error)
+	// DeleteMenu 菜单 - 删除
+	DeleteMenu(context.Context, *IdReq) (*CheckReply, error)
 	// DeleteRole 角色删除
-	DeleteRole(context.Context, *DeleteRoleReq) (*CheckReply, error)
+	DeleteRole(context.Context, *IdReq) (*CheckReply, error)
 	// GetApiList Api列表 - 分页
 	GetApiList(context.Context, *GetApiListReq) (*GetApiListReply, error)
 	// GetApiListAll ================== Api ==================
 	// Api列表 - 所有
 	GetApiListAll(context.Context, *emptypb.Empty) (*GetApiListAllReply, error)
+	// GetMenuAll ================== 菜单 ==================
+	// 菜单列表 - 全部
+	GetMenuAll(context.Context, *emptypb.Empty) (*GetMenuTreeReply, error)
+	// GetMenuTree 菜单列表 - 树状结构
+	GetMenuTree(context.Context, *emptypb.Empty) (*GetMenuTreeReply, error)
 	// GetRoleAll ================== 角色 ==================
 	// 全部角色
 	GetRoleAll(context.Context, *emptypb.Empty) (*GetRoleAllReply, error)
 	GetRoleList(context.Context, *GetRoleListReq) (*GetRoleListReply, error)
 	// UpdateApi Api更新
 	UpdateApi(context.Context, *UpdateApiReq) (*CheckReply, error)
+	// UpdateMenu 菜单 - 更新
+	UpdateMenu(context.Context, *UpdateMenuReq) (*CheckReply, error)
 	// UpdateRole 角色更新
 	UpdateRole(context.Context, *UpdateRoleReq) (*CheckReply, error)
 }
@@ -70,6 +86,11 @@ func RegisterAuthorizationServiceHTTPServer(s *http.Server, srv AuthorizationSer
 	r.POST("/role", _AuthorizationService_CreateRole0_HTTP_Handler(srv))
 	r.PUT("/role", _AuthorizationService_UpdateRole0_HTTP_Handler(srv))
 	r.DELETE("/role", _AuthorizationService_DeleteRole0_HTTP_Handler(srv))
+	r.GET("/menuAll", _AuthorizationService_GetMenuAll0_HTTP_Handler(srv))
+	r.GET("/menuTree", _AuthorizationService_GetMenuTree0_HTTP_Handler(srv))
+	r.POST("/menu", _AuthorizationService_CreateMenu0_HTTP_Handler(srv))
+	r.PUT("/menu", _AuthorizationService_UpdateMenu0_HTTP_Handler(srv))
+	r.DELETE("/menu", _AuthorizationService_DeleteMenu0_HTTP_Handler(srv))
 }
 
 func _AuthorizationService_CheckAuthorization0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
@@ -169,13 +190,13 @@ func _AuthorizationService_UpdateApi0_HTTP_Handler(srv AuthorizationServiceHTTPS
 
 func _AuthorizationService_DeleteApi0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in DeleteApiReq
+		var in IdReq
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationAuthorizationServiceDeleteApi)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteApi(ctx, req.(*DeleteApiReq))
+			return srv.DeleteApi(ctx, req.(*IdReq))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -264,13 +285,108 @@ func _AuthorizationService_UpdateRole0_HTTP_Handler(srv AuthorizationServiceHTTP
 
 func _AuthorizationService_DeleteRole0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
 	return func(ctx http.Context) error {
-		var in DeleteRoleReq
+		var in IdReq
 		if err := ctx.BindQuery(&in); err != nil {
 			return err
 		}
 		http.SetOperation(ctx, OperationAuthorizationServiceDeleteRole)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.DeleteRole(ctx, req.(*DeleteRoleReq))
+			return srv.DeleteRole(ctx, req.(*IdReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CheckReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthorizationService_GetMenuAll0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthorizationServiceGetMenuAll)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetMenuAll(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetMenuTreeReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthorizationService_GetMenuTree0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in emptypb.Empty
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthorizationServiceGetMenuTree)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetMenuTree(ctx, req.(*emptypb.Empty))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetMenuTreeReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthorizationService_CreateMenu0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateMenuReq
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthorizationServiceCreateMenu)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateMenu(ctx, req.(*CreateMenuReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*Menu)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthorizationService_UpdateMenu0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateMenuReq
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthorizationServiceUpdateMenu)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateMenu(ctx, req.(*UpdateMenuReq))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CheckReply)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AuthorizationService_DeleteMenu0_HTTP_Handler(srv AuthorizationServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in IdReq
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAuthorizationServiceDeleteMenu)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteMenu(ctx, req.(*IdReq))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -284,14 +400,19 @@ func _AuthorizationService_DeleteRole0_HTTP_Handler(srv AuthorizationServiceHTTP
 type AuthorizationServiceHTTPClient interface {
 	CheckAuthorization(ctx context.Context, req *CheckAuthorizationReq, opts ...http.CallOption) (rsp *CheckAuthorizationReply, err error)
 	CreateApi(ctx context.Context, req *CreateApiReq, opts ...http.CallOption) (rsp *Api, err error)
+	CreateMenu(ctx context.Context, req *CreateMenuReq, opts ...http.CallOption) (rsp *Menu, err error)
 	CreateRole(ctx context.Context, req *CreateRoleReq, opts ...http.CallOption) (rsp *Role, err error)
-	DeleteApi(ctx context.Context, req *DeleteApiReq, opts ...http.CallOption) (rsp *CheckReply, err error)
-	DeleteRole(ctx context.Context, req *DeleteRoleReq, opts ...http.CallOption) (rsp *CheckReply, err error)
+	DeleteApi(ctx context.Context, req *IdReq, opts ...http.CallOption) (rsp *CheckReply, err error)
+	DeleteMenu(ctx context.Context, req *IdReq, opts ...http.CallOption) (rsp *CheckReply, err error)
+	DeleteRole(ctx context.Context, req *IdReq, opts ...http.CallOption) (rsp *CheckReply, err error)
 	GetApiList(ctx context.Context, req *GetApiListReq, opts ...http.CallOption) (rsp *GetApiListReply, err error)
 	GetApiListAll(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetApiListAllReply, err error)
+	GetMenuAll(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetMenuTreeReply, err error)
+	GetMenuTree(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetMenuTreeReply, err error)
 	GetRoleAll(ctx context.Context, req *emptypb.Empty, opts ...http.CallOption) (rsp *GetRoleAllReply, err error)
 	GetRoleList(ctx context.Context, req *GetRoleListReq, opts ...http.CallOption) (rsp *GetRoleListReply, err error)
 	UpdateApi(ctx context.Context, req *UpdateApiReq, opts ...http.CallOption) (rsp *CheckReply, err error)
+	UpdateMenu(ctx context.Context, req *UpdateMenuReq, opts ...http.CallOption) (rsp *CheckReply, err error)
 	UpdateRole(ctx context.Context, req *UpdateRoleReq, opts ...http.CallOption) (rsp *CheckReply, err error)
 }
 
@@ -329,6 +450,19 @@ func (c *AuthorizationServiceHTTPClientImpl) CreateApi(ctx context.Context, in *
 	return &out, err
 }
 
+func (c *AuthorizationServiceHTTPClientImpl) CreateMenu(ctx context.Context, in *CreateMenuReq, opts ...http.CallOption) (*Menu, error) {
+	var out Menu
+	pattern := "/menu"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAuthorizationServiceCreateMenu))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
 func (c *AuthorizationServiceHTTPClientImpl) CreateRole(ctx context.Context, in *CreateRoleReq, opts ...http.CallOption) (*Role, error) {
 	var out Role
 	pattern := "/role"
@@ -342,7 +476,7 @@ func (c *AuthorizationServiceHTTPClientImpl) CreateRole(ctx context.Context, in 
 	return &out, err
 }
 
-func (c *AuthorizationServiceHTTPClientImpl) DeleteApi(ctx context.Context, in *DeleteApiReq, opts ...http.CallOption) (*CheckReply, error) {
+func (c *AuthorizationServiceHTTPClientImpl) DeleteApi(ctx context.Context, in *IdReq, opts ...http.CallOption) (*CheckReply, error) {
 	var out CheckReply
 	pattern := "/api"
 	path := binding.EncodeURL(pattern, in, true)
@@ -355,7 +489,20 @@ func (c *AuthorizationServiceHTTPClientImpl) DeleteApi(ctx context.Context, in *
 	return &out, err
 }
 
-func (c *AuthorizationServiceHTTPClientImpl) DeleteRole(ctx context.Context, in *DeleteRoleReq, opts ...http.CallOption) (*CheckReply, error) {
+func (c *AuthorizationServiceHTTPClientImpl) DeleteMenu(ctx context.Context, in *IdReq, opts ...http.CallOption) (*CheckReply, error) {
+	var out CheckReply
+	pattern := "/menu"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAuthorizationServiceDeleteMenu))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AuthorizationServiceHTTPClientImpl) DeleteRole(ctx context.Context, in *IdReq, opts ...http.CallOption) (*CheckReply, error) {
 	var out CheckReply
 	pattern := "/role"
 	path := binding.EncodeURL(pattern, in, true)
@@ -386,6 +533,32 @@ func (c *AuthorizationServiceHTTPClientImpl) GetApiListAll(ctx context.Context, 
 	pattern := "/apiAll"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationAuthorizationServiceGetApiListAll))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AuthorizationServiceHTTPClientImpl) GetMenuAll(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetMenuTreeReply, error) {
+	var out GetMenuTreeReply
+	pattern := "/menuAll"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAuthorizationServiceGetMenuAll))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AuthorizationServiceHTTPClientImpl) GetMenuTree(ctx context.Context, in *emptypb.Empty, opts ...http.CallOption) (*GetMenuTreeReply, error) {
+	var out GetMenuTreeReply
+	pattern := "/menuTree"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAuthorizationServiceGetMenuTree))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
@@ -425,6 +598,19 @@ func (c *AuthorizationServiceHTTPClientImpl) UpdateApi(ctx context.Context, in *
 	pattern := "/api"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationAuthorizationServiceUpdateApi))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, err
+}
+
+func (c *AuthorizationServiceHTTPClientImpl) UpdateMenu(ctx context.Context, in *UpdateMenuReq, opts ...http.CallOption) (*CheckReply, error) {
+	var out CheckReply
+	pattern := "/menu"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAuthorizationServiceUpdateMenu))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {

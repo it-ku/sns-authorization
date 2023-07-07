@@ -132,6 +132,89 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/authorization.v1.CheckAuthorizationReply'
+    /menu:
+        put:
+            tags:
+                - AuthorizationService
+            description: 菜单 - 更新
+            operationId: AuthorizationService_UpdateMenu
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/authorization.v1.UpdateMenuReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.CheckReply'
+        post:
+            tags:
+                - AuthorizationService
+            description: 菜单 - 创建
+            operationId: AuthorizationService_CreateMenu
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/authorization.v1.CreateMenuReq'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.Menu'
+        delete:
+            tags:
+                - AuthorizationService
+            description: 菜单 - 删除
+            operationId: AuthorizationService_DeleteMenu
+            parameters:
+                - name: id
+                  in: query
+                  schema:
+                    type: integer
+                    format: int64
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.CheckReply'
+    /menuAll:
+        get:
+            tags:
+                - AuthorizationService
+            description: |-
+                ================== 菜单 ==================
+                 菜单列表 - 全部
+            operationId: AuthorizationService_GetMenuAll
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.GetMenuTreeReply'
+    /menuTree:
+        get:
+            tags:
+                - AuthorizationService
+            description: 菜单列表 - 树状结构
+            operationId: AuthorizationService_GetMenuTree
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/authorization.v1.GetMenuTreeReply'
     /role:
         put:
             tags:
@@ -271,6 +354,30 @@ components:
                 path:
                     type: string
             description: Api创建
+        authorization.v1.CreateMenuReq:
+            type: object
+            properties:
+                parentId:
+                    type: integer
+                    format: int64
+                path:
+                    type: string
+                name:
+                    type: string
+                hidden:
+                    type: boolean
+                component:
+                    type: string
+                sort:
+                    type: integer
+                    format: int64
+                title:
+                    type: string
+                icon:
+                    type: string
+                parentIds:
+                    type: string
+            description: ================== 角色信息 ================== 菜单创建
         authorization.v1.CreateRoleReq:
             type: object
             properties:
@@ -295,6 +402,14 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/authorization.v1.Api'
+        authorization.v1.GetMenuTreeReply:
+            type: object
+            properties:
+                list:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/authorization.v1.Menu'
+            description: 响应 - 菜单树列表
         authorization.v1.GetRoleAllReply:
             type: object
             properties:
@@ -313,6 +428,41 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/authorization.v1.Role'
+        authorization.v1.Menu:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                parentId:
+                    type: integer
+                    format: int64
+                path:
+                    type: string
+                name:
+                    type: string
+                hidden:
+                    type: boolean
+                component:
+                    type: string
+                sort:
+                    type: integer
+                    format: int64
+                title:
+                    type: string
+                icon:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                children:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/authorization.v1.Menu'
+                parentIds:
+                    type: string
+            description: 菜单详情
         authorization.v1.Role:
             type: object
             properties:
@@ -336,6 +486,33 @@ components:
                 path:
                     type: string
             description: Api更新
+        authorization.v1.UpdateMenuReq:
+            type: object
+            properties:
+                id:
+                    type: integer
+                    format: int64
+                parentId:
+                    type: integer
+                    format: int64
+                path:
+                    type: string
+                name:
+                    type: string
+                hidden:
+                    type: boolean
+                component:
+                    type: string
+                sort:
+                    type: integer
+                    format: int64
+                title:
+                    type: string
+                icon:
+                    type: string
+                parentIds:
+                    type: string
+            description: 菜单更新
         authorization.v1.UpdateRoleReq:
             type: object
             properties:
